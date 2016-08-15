@@ -1246,6 +1246,9 @@ class baseRouter
     public function setActionExtFile()
     {
         $moduleExtPaths  = $this->getModuleExtPath('', $this->moduleName, 'control');
+        
+        /* 如果扩展目录为空，不包含任何扩展文件。If there's no ext pathes return false.*/
+        if(empty($moduleExtPaths)) return false;
 
         /* 如果extensionLevel == 2，且扩展文件存在，返回该站点扩展文件。If extensionLevel == 2 and site extensionFile exists, return it. */
         if($this->config->framework->extensionLevel == 2)
