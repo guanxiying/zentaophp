@@ -847,7 +847,6 @@ class baseRouter
         /* Fix clientLang for ie >= 10. https://www.drupal.org/node/365615. */
         if(stripos($lang, 'hans')) $lang = 'zh-cn';
         if(stripos($lang, 'hant')) $lang = 'zh-tw';
-
         return $lang;
     }
 
@@ -1251,7 +1250,7 @@ class baseRouter
         if(empty($moduleExtPaths)) return false;
 
         /* 如果extensionLevel == 2，且扩展文件存在，返回该站点扩展文件。If extensionLevel == 2 and site extensionFile exists, return it. */
-        if($this->config->framework->extensionLevel == 2)
+        if($this->config->framework->extensionLevel == 2 and !empty( $moduleExtPaths['site']))
         {
             $this->extActionFile = $moduleExtPaths['site'] . $this->methodName . '.php';
             if(file_exists($this->extActionFile)) return true;
@@ -1288,6 +1287,8 @@ class baseRouter
         $modelExtPaths = $this->getModuleExtPath($appName, $moduleName, 'model');
         foreach($modelExtPaths as $extType => $modelExtPath)
         {
+            if(empty($modelExtPath)) continue;
+
             $tmpHookFiles =  helper::ls($modelExtPath . 'hook/', '.php');
             $tmpExtFiles  =  helper::ls($modelExtPath, '.php');
             $hookFiles    = array_merge($hookFiles, $tmpHookFiles);
@@ -1850,8 +1851,8 @@ class baseRouter
 
         /* 查找扩展配置文件。Get extension config files. */
         if($config->framework->extensionLevel > 0)  $extConfigPath        = $this->getModuleExtPath($appName, $moduleName, 'config');
-        if($config->framework->extensionLevel >= 1) $commonExtConfigFiles = helper::ls($extConfigPath['common'], '.php');
-        if($config->framework->extensionLevel == 2) $siteExtConfigFiles   = helper::ls($extConfigPath['site'], '.php');
+        if($config->framework->extensionLevel >= 1 and $extConfigPath['common']) $commonExtConfigFiles = helper::ls($extConfigPath['common'], '.php');
+        if($config->framework->extensionLevel == 2 and $extConfigPath['site'])   $siteExtConfigFiles   = helper::ls($extConfigPath['site'], '.php');
         $extConfigFiles = array_merge($commonExtConfigFiles, $siteExtConfigFiles);
 
         /* 将主配置文件和扩展配置文件合并在一起。Put the main config file and extension config files together. */
@@ -1925,8 +1926,8 @@ class baseRouter
             $siteExtLangFiles   = array();
 
             $extLangPath = $this->getModuleExtPath($appName, $moduleName, 'lang');
-            if($this->config->framework->extensionLevel == 1) $commonExtLangFiles = helper::ls($extLangPath['common'] . $this->clientLang, '.php');
-            if($this->config->framework->extensionLevel == 2) $siteExtLangFiles   = helper::ls($extLangPath['site'] . $this->clientLang, '.php');
+            if($this->config->framework->extensionLevel == 1 and $extLangPath['common']) $commonExtLangFiles = helper::ls($extLangPath['common'] . $this->clientLang, '.php');
+            if($this->config->framework->extensionLevel == 2 and $extLangPath['site'])   $siteExtLangFiles   = helper::ls($extLangPath['site'] . $this->clientLang, '.php');
             $extLangFiles  = array_merge($commonExtLangFiles, $siteExtLangFiles);
         }
 
